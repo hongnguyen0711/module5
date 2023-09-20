@@ -3,7 +3,7 @@ import "bootstrap/dist/js/bootstrap.bundle.min";
 import React, {useState} from 'react';
 
 function Service() {
-    const [service, setService] = useState([
+    const [services, setService] = useState([
         {
             id: 1,
             name: "Single Bedroom",
@@ -44,13 +44,13 @@ function Service() {
     return (
         <div>
             <div className="row row-cols-1 row-cols-md-3 g-4">
-                {service.map((element) => (
-                    <div key={element.id} className="col">
+                {services.map((service) => (
+                    <div key={service.id} className="col">
                         <div className="card h-100">
-                            <img src={element.img} className="card-img-top" alt={"..."}/>
+                            <img src={service.img} className="card-img-top" alt={"..."}/>
                             <div className="card-body">
-                                <h5 className="card-title">{element.name}</h5>
-                                <p className="card-text">Room size: {element.size}</p>
+                                <h5 className="card-title">{service.name}</h5>
+                                <p className="card-text">Room size: {service.size}</p>
                             </div>
                             <div className="card-icons">
                                 <button className="btn btn-primary">Sửa</button>

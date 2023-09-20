@@ -44,7 +44,7 @@ export function CustomerList() {
             <table className="table table-striped">
                 <thead>
                 <tr>
-                    <th>Id</th>
+                    <th>Stt</th>
                     <th>Họ Tên</th>
                     <th>Ngày sinh</th>
                     <th>Giới tính</th>
@@ -58,10 +58,10 @@ export function CustomerList() {
                 </tr>
                 </thead>
                 <tbody>
-                {customers.map((customer) => {
+                {customers.map((customer, index) => {
                     return (
                         <tr key={customer.id}>
-                            <td>{customer.id}</td>
+                            <td>{index+1}</td>
                             <td>{customer.name}</td>
                             <td>{customer.date}</td>
                             <td>{customer.gender}</td>
