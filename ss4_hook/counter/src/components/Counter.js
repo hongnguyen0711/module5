@@ -2,7 +2,7 @@ import React from "react";
 import {useIncrement} from "./UseIncrement";
 
 export function Counter({addAmount}) {
-    const [count, increase] = useIncrement(addAmount);
+    const [count, increase] = useIncrement(0,addAmount);
 
     return (
         <div>
