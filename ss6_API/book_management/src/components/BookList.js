@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import * as bookService from "../services/BookService";
 import {Link} from "react-router-dom";
 
@@ -13,7 +13,7 @@ export function BookList() {
     return (
         <>
             <h1>Library</h1>
-            <Link className="btn btn-outline-primary" to="/add">Add</Link>
+            <Link className="btn btn-outline-primary" to="/create">Add</Link>
             <table className="table table-hover">
                 <thead>
                 <tr>
@@ -38,3 +38,4 @@ export function BookList() {
         </>
     );
 }
+export default BookList;

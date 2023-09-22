@@ -1,6 +1,5 @@
 {
-  "books":
-  [
+  "books": [
     {
       "id": 1,
       "title": "book number one",
@@ -15,6 +14,16 @@
       "id": 3,
       "title": "book number three",
       "quantity": 120
+    },
+    {
+      "title": "",
+      "quantity": 0,
+      "id": 4
+    },
+    {
+      "title": "",
+      "quantity": 0,
+      "id": 5
     }
   ]
 }
