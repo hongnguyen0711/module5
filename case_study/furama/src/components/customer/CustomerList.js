@@ -1,47 +1,55 @@
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap/dist/js/bootstrap.bundle.min";
-import {useState} from "react";
+import React, {useEffect, useState} from "react";
+import {Link} from "react-router-dom";
+import Header from "../header/Header";
+import Footer from "../footer/Footer";
+import {useNavigate} from "react-router";
+import * as customerService from "../../services/CustomerService";
+import {toast} from "react-toastify";
+import {Button, Modal} from "react-bootstrap";
 
 export function CustomerList() {
-    const [customers, setCustomer] = useState(
-        [{
-            id: 1,
-            name: "Le Hi",
-            date: "12/20/2022",
-            gender: "Nam",
-            card: "12202000",
-            phone: "0321654987",
-            email: "hihi@gmail.com",
-            type: "Diamond",
-            address: "12 Chế Lan Viên"
-        },
-            {
-                id: 2,
-                name: "Le Hi",
-                date: "12/20/2022",
-                gender: "Nam",
-                card: "12202000",
-                phone: "0321654987",
-                email: "hihi@gmail.com",
-                type: "Diamond",
-                address: "12 Chế Lan Viên"
-            },
-            {
-                id: 3,
-                name: "Le Hi",
-                date: "12/20/2022",
-                gender: "Nam",
-                card: "12202000",
-                phone: "0321654987",
-                email: "hihi@gmail.com",
-                type: "Diamond",
-                address: "12 Chế Lan Viên"
-            }]
-    );
+    const navigate = useNavigate();
+    const [customers, setCustomers] = useState([]);
+    const [selectedCustomer, setSelectedCustomer] = useState(null);
+    const [showModal, setShowModal] = useState(false);
+
+    useEffect(() => {
+        getCustomer();
+    }, []);
+
+    const getCustomer = async () => {
+        setCustomers(await customerService.getAll());
+    };
+    const handleCloseModal = () => {
+        setShowModal(false);
+        setSelectedCustomer(null);
+    };
+
+    const handleShowModal = (book) => {
+        setSelectedCustomer(book);
+        setShowModal(true);
+    };
+
+    const deleteCustomer = async () => {
+        await customerService.del(selectedCustomer);
+        setCustomers(customers.filter((customer) => customer.id !== selectedCustomer.id));//Xóa sách khỏi danh sách
+        setShowModal(false); // Ẩn modal sau khi xóa sách
+        setSelectedCustomer(null);
+        navigate("/customer"); // Chuyển hướng về trang danh sách
+        toast("Delete successfully");
+
+    };
+
     return (
         <>
-            <h1 style={{textAlign: "center"}}>Danh sách khách hàng</h1>
-            <table className="table table-striped">
+            <Header/>
+            <h1 style={{textAlign: "center"}}>Khách Hàng</h1>
+            <Link className="btn btn-outline-primary" to="/createCustomer" style={{marginBottom: "1%"}}>
+                Thêm mới
+            </Link>
+            <table className="table table-dark table-hover ">
                 <thead>
                 <tr>
                     <th>Stt</th>
@@ -61,7 +69,7 @@ export function CustomerList() {
                 {customers.map((customer, index) => {
                     return (
                         <tr key={customer.id}>
-                            <td>{index+1}</td>
+                            <td>{index + 1}</td>
                             <td>{customer.name}</td>
                             <td>{customer.date}</td>
                             <td>{customer.gender}</td>
@@ -71,26 +79,54 @@ export function CustomerList() {
                             <td>{customer.type}</td>
                             <td>{customer.address}</td>
                             <td>
-                                <button className="btn btn-primary">Sửa</button>
+                                <Link className="btn btn-outline-primary" to={`/editCustomer/${customer.id}`}>Sửa</Link>
                             </td>
                             <td>
-                                <button type="button" className="btn btn-danger" data-bs-toggle="modal"
-                                        data-bs-target="#exampleModal">
-                                    Xóa
-                                </button>
+                                <Button variant="btn btn-outline-danger" onClick={() => handleShowModal(customer)}>
+                                    Delete
+                                </Button>
                             </td>
                         </tr>
                     )
                 })}
                 </tbody>
             </table>
+            <Modal show={showModal} onHide={handleCloseModal}>
+                <MyModal action={handleCloseModal} customer={selectedCustomer} onDelete={deleteCustomer}/>
+            </Modal>
             <div style={{textAlign: "center"}}>
                 <a>Trước</a>
                 <span>/</span>
                 <a>Sau</a>
             </div>
-
+            <Footer/>
         </>
 
     )
+}
+
+function MyModal(props) {
+    const {action, customer, onDelete} = props;
+    const handleDelete = () => {
+        onDelete();
+    };
+
+    return (
+        <>
+            <Modal.Header closeButton>
+                <Modal.Title>Xóa {customer?.name}</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+                Bạn có muốn xóa khách hàng {customer?.name} không? Lưu ý hoạt động này không thể hoàn tác!
+            </Modal.Body>
+            <Modal.Footer>
+                <Button variant="btn btn-outline-secondary" onClick={action}>
+                    Close
+                </Button>
+                <Button variant="btn btn-outline-danger" onClick={handleDelete}>
+                    Delete
+                </Button>
+            </Modal.Footer>
+        </>
+    );
 }

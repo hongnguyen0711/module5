@@ -1,14 +1,11 @@
-import "bootstrap/dist/css/bootstrap.css";
-import "bootstrap/dist/js/bootstrap.bundle.min";
-
 function Footer() {
     return (
         <>
-            <footer>
+            <footer style={{marginTop: "2%"}}>
                 <div className="container">
                     <div className="row">
                         <div className="col-lg-6">
-                            <div className="contact-info" style="margin-top: 3%">
+                            <div className="contact-info"  style={{marginTop: "3%"}} >
                                 <h3>Thông tin liên hệ</h3>
                                 <p>Địa chỉ: 123 Đường Chế Lan Viên, Quận 3, TP. ĐN</p>
                                 <p>Số điện thoại: 0901234567</p>
@@ -16,7 +13,7 @@ function Footer() {
                             </div>
                         </div>
                         <div className="col-lg-6">
-                            <div className="social-media" style="margin-top: 3%">
+                            <div className="social-media" style={{marginTop: "3%"}}>
                                 <h3>Kết nối với chúng tôi</h3>
                                 <ul className="list-inline social-icons">
                                     <li className="list-inline-item"><a href="#"><i

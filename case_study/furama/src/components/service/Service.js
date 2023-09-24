@@ -1,5 +1,6 @@
-import "bootstrap/dist/css/bootstrap.css";
-import "bootstrap/dist/js/bootstrap.bundle.min";
+import Header from "../header/Header";
+import Footer from "../footer/Footer";
+
 import React, {useState} from 'react';
 
 function Service() {
@@ -43,7 +44,17 @@ function Service() {
     ])
     return (
         <div>
-            <div className="row row-cols-1 row-cols-md-3 g-4">
+            <Header/>
+            <img
+                src="https://ezcloud.vn/wp-content/uploads/2019/11/villa-la-gi.webp"
+                style={{
+                    width: '80%',
+                    marginLeft: '10%',
+                    height: '250px',
+                    marginBottom: '2%',
+                }}
+            />
+                <div className="row row-cols-1 row-cols-md-3 g-4">
                 {services.map((service) => (
                     <div key={service.id} className="col">
                         <div className="card h-100">
@@ -53,13 +64,14 @@ function Service() {
                                 <p className="card-text">Room size: {service.size}</p>
                             </div>
                             <div className="card-icons">
-                                <button className="btn btn-primary">Sửa</button>
-                                <button className="btn btn-danger">Xóa</button>
+                                <button className="btn btn-outline-primary">Sửa</button>
+                                <button className="btn btn-outline-danger">Xóa</button>
                             </div>
                         </div>
                     </div>
                 ))}
             </div>
+            <Footer/>
         </div>
     );
 }

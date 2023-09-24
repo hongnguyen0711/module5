@@ -1,4 +1,7 @@
 import React from 'react';
+import Footer from "../footer/Footer";
+import Header from "../header/Header";
+import {Link} from "react-router-dom";
 
 function Contracts() {
     const contracts = [
@@ -46,7 +49,12 @@ function Contracts() {
 
     return (
         <div className="table-responsive">
-            <table className="table table-striped table-bordered zero-configuration">
+            <Header/>
+            <h1 style={{textAlign: "center"}}>Hợp Đồng</h1>
+            <Link className="btn btn-outline-primary" to="/createContract" style={{marginBottom: "1%"}}>
+                Thêm mới
+            </Link>
+            <table className="table table-dark table-hover table-bordered zero-configuration">
                 <thead>
                 <tr>
                     <th>STT</th>
@@ -71,6 +79,12 @@ function Contracts() {
                 ))}
                 </tbody>
             </table>
+            <div style={{textAlign: "center"}}>
+                <a>Trước</a>
+                <span>/</span>
+                <a>Sau</a>
+            </div>
+            <Footer/>
         </div>
     );
 }

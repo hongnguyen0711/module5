@@ -1,7 +1,9 @@
 .App {
     text-align: center;
 }
-
+.form-err{
+    color: red;
+}
 .App-logo {
     height: 40vmin;
     pointer-events: none;
@@ -30,8 +32,23 @@
 
 ul, li, a {
     color: white;
-    font-family: Tahoma;
+    font-family: montserrat, serif;
     font-size: medium;
+}
+
+body {
+    background-image: url('https://nhadepso.com/wp-content/uploads/2023/02/hinh-nen-xam_1.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
+    font-family: montserrat, serif;
+    margin: 0;
+    padding: 0;
+}
+
+table, th, tr, td, h1 {
+    font-family: Tahoma, serif;
 }
 
 @keyframes App-logo-spin {
