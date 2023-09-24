@@ -7,6 +7,7 @@ import React from "react";
 import {BookCreate} from "./components/BookCreate";
 import 'react-toastify/dist/ReactToastify.css';
 import {ToastContainer} from "react-toastify";
+import {BookEdit} from "./components/BookEdit";
 
 function App() {
     return (
@@ -14,6 +15,7 @@ function App() {
             <Routes>
                 <Route path="" element={<BookList/>}/>
                 <Route path="/create" element={<BookCreate/>}/>
+                <Route path="/edit/:id" element={<BookEdit/>}/>
             </Routes>
             <ToastContainer/>
         </>

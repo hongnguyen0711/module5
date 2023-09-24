@@ -1,19 +1,50 @@
 import React, {useEffect, useState} from "react";
 import * as bookService from "../services/BookService";
-import {Link} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
+import {Button, Modal} from "react-bootstrap";
+import {toast} from "react-toastify";
+
 
 export function BookList() {
+    const navigate = useNavigate();
     const [books, setBooks] = useState([]);
-    const getBook = async () => {
-        setBooks(await bookService.getAll());
-    }
+    const [selectedBook, setSelectedBook] = useState(null);
+    const [showModal, setShowModal] = useState(false);
+
     useEffect(() => {
         getBook();
     }, []);
+
+    const getBook = async () => {
+        setBooks(await bookService.getAll());
+    };
+
+    const handleCloseModal = () => {
+        setShowModal(false);
+        setSelectedBook(null);
+    };
+
+    const handleShowModal = (book) => {
+        setSelectedBook(book);
+        setShowModal(true);
+    };
+
+    const deleteBook = async () => {
+        await bookService.del(selectedBook);
+        setBooks(books.filter((book) => book.id !== selectedBook.id));//Xóa sách khỏi danh sách
+        setShowModal(false); // Ẩn modal sau khi xóa sách
+        setSelectedBook(null);
+        navigate("/"); // Chuyển hướng về trang danh sách
+        toast("Delete successfully");
+
+    };
+
     return (
         <>
             <h1>Library</h1>
-            <Link className="btn btn-outline-primary" to="/create">Add</Link>
+            <Link className="btn btn-outline-primary" to="/create">
+                Add
+            </Link>
             <table className="table table-hover">
                 <thead>
                 <tr>
@@ -23,19 +54,51 @@ export function BookList() {
                 </tr>
                 </thead>
                 <tbody>
-                {
-                    books.map((b) => (
-                        <tr key={b.id}>
-                            <td>{b.title}</td>
-                            <td>{b.quantity}</td>
-                            <td><Link className="btn btn-outline-primary" to="/edit">Edit</Link></td>
-                            <td><Link className="btn btn-outline-danger" to="/delete">Delete</Link></td>
-                        </tr>
-                    ))
-                }
+                {books.map((book) => (
+                    <tr key={book.id}>
+                        <td>{book.title}</td>
+                        <td>{book.quantity}</td>
+                        <td>
+                            <Link className="btn btn-outline-primary" to={`/edit/${book.id}`}>
+                                Edit
+                            </Link>
+                        </td>
+                        <td>
+                            <Button variant="btn btn-outline-danger" onClick={() => handleShowModal(book)}>
+                                Delete
+                            </Button>
+                        </td>
+                    </tr>
+                ))}
                 </tbody>
             </table>
+            <Modal show={showModal} onHide={handleCloseModal}>
+                <MyModal action={handleCloseModal} book={selectedBook} onDelete={deleteBook}/>
+            </Modal>
         </>
     );
 }
-export default BookList;
+
+function MyModal(props) {
+    const {action, book, onDelete} = props;
+    const handleDelete = () => {
+        onDelete();
+    };
+
+    return (
+        <>
+            <Modal.Header closeButton>
+                <Modal.Title>Delete {book?.title}</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>Are you sure to delete {book?.title}?</Modal.Body>
+            <Modal.Footer>
+                <Button variant="btn btn-outline-secondary" onClick={action}>
+                    Close
+                </Button>
+                <Button variant="btn btn-outline-danger" onClick={handleDelete}>
+                    Delete
+                </Button>
+            </Modal.Footer>
+        </>
+    );
+}

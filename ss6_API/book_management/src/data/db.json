@@ -16,14 +16,9 @@
       "quantity": 120
     },
     {
-      "title": "",
-      "quantity": 0,
+      "title": "book",
+      "quantity": 1,
       "id": 4
-    },
-    {
-      "title": "",
-      "quantity": 0,
-      "id": 5
     }
   ]
 }
