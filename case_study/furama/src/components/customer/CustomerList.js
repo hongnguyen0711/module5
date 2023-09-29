@@ -4,52 +4,101 @@ import React, {useEffect, useState} from "react";
 import {Link} from "react-router-dom";
 import Header from "../header/Header";
 import Footer from "../footer/Footer";
-import {useNavigate} from "react-router";
 import * as customerService from "../../services/CustomerService";
 import {toast} from "react-toastify";
 import {Button, Modal} from "react-bootstrap";
+import {MyModal} from "../common/ModalDelete";
+
 
 export function CustomerList() {
-    const navigate = useNavigate();
+    console.log(1)
     const [customers, setCustomers] = useState([]);
+
     const [selectedCustomer, setSelectedCustomer] = useState(null);
     const [showModal, setShowModal] = useState(false);
 
-    useEffect(() => {
-        getCustomer();
-    }, []);
+    const [limit, setLimit] = useState(3);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [records, setRecords] = useState();
+    const [totalPage, setTotalPage] = useState();
+    const [searchName, setSearchName] = useState("");
+    const [searchEmail, setSearchEmail] = useState("");
+    const [refresh, setRefresh] = useState(false);
 
-    const getCustomer = async () => {
-        setCustomers(await customerService.getAll());
-    };
+    const getCustomerList = async () => {
+        const newList = await customerService.getAllPage(currentPage, limit, searchName, searchEmail);
+        console.log(2)
+        setCustomers(newList[0]);
+        setRecords(newList[1]);
+        console.log(newList[2]);
+        setTotalPage(Math.ceil(newList[1] / limit));
+
+        // if (newList[0].length===0){
+        //     toast("Không tìm thấy!");
+        // }
+    }
+
+    useEffect(() => {
+        console.log(3)
+        getCustomerList();
+    }, [refresh, searchName, limit, searchEmail] );
+
+    const previousPage = () => {
+
+        setCurrentPage(currentPage - 1);
+        setRefresh(!refresh);
+    }
+
+    const nextPage = () => {
+        console.log(4)
+        if (currentPage < totalPage) {
+            setCurrentPage(currentPage + 1);
+            setRefresh(!refresh);
+        }
+    }
+
     const handleCloseModal = () => {
         setShowModal(false);
         setSelectedCustomer(null);
     };
 
-    const handleShowModal = (book) => {
-        setSelectedCustomer(book);
+    const handleShowModal = (customer) => {
+        setSelectedCustomer(customer);
         setShowModal(true);
     };
 
     const deleteCustomer = async () => {
         await customerService.del(selectedCustomer);
-        setCustomers(customers.filter((customer) => customer.id !== selectedCustomer.id));//Xóa sách khỏi danh sách
+        setCustomers(customers.filter((customer) => customer.id !== selectedCustomer.id));//Xóa kh khỏi danh sách
         setShowModal(false); // Ẩn modal sau khi xóa sách
         setSelectedCustomer(null);
-        navigate("/customer"); // Chuyển hướng về trang danh sách
-        toast("Delete successfully");
-
+        toast("Xóa thành công!");
     };
-
+console.log(5)
     return (
         <>
             <Header/>
-            <h1 style={{textAlign: "center"}}>Khách Hàng</h1>
-            <Link className="btn btn-outline-primary" to="/createCustomer" style={{marginBottom: "1%"}}>
-                Thêm mới
-            </Link>
-            <table className="table table-dark table-hover ">
+            <h1 style={{textAlign: "center", color: "#574d4c"}}>Khách Hàng</h1>
+            <div style={{display: "flex", marginBottom: "1%", marginLeft: "1%"}}>
+                <input type="text" className="form-control" placeholder="Tìm kiếm.." style={{width: "30%"}}
+                       onChange={(event) => {
+                           setSearchName(event.target.value)
+                           setSearchEmail(event.target.value)
+                       }} />
+                <Link className="btn btn-outline-primary" to="/createCustomer" style={{marginLeft: "1%"}}>
+                    Thêm mới
+                </Link>
+                <select onChange={(event) => setLimit(event.target.value)} aria-label=".form-select-sm example">
+                    <option value="3"> Chọn số lượng bản ghi</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                </select>
+
+            </div>
+            <table className="table table-striped table-hover ">
                 <thead>
                 <tr>
                     <th>Stt</th>
@@ -76,14 +125,14 @@ export function CustomerList() {
                             <td>{customer.card}</td>
                             <td>{customer.phone}</td>
                             <td>{customer.email}</td>
-                            <td>{customer.type}</td>
+                            <td>{customer.type.name}</td>
                             <td>{customer.address}</td>
                             <td>
                                 <Link className="btn btn-outline-primary" to={`/editCustomer/${customer.id}`}>Sửa</Link>
                             </td>
                             <td>
                                 <Button variant="btn btn-outline-danger" onClick={() => handleShowModal(customer)}>
-                                    Delete
+                                    xóa
                                 </Button>
                             </td>
                         </tr>
@@ -91,42 +140,32 @@ export function CustomerList() {
                 })}
                 </tbody>
             </table>
-            <Modal show={showModal} onHide={handleCloseModal}>
-                <MyModal action={handleCloseModal} customer={selectedCustomer} onDelete={deleteCustomer}/>
-            </Modal>
-            <div style={{textAlign: "center"}}>
-                <a>Trước</a>
-                <span>/</span>
-                <a>Sau</a>
+            {/*phân trang*/}
+            <div style={{whiteSpace: 'nowrap', textAlign: "center"}}>
+                <div style={{display: 'inline-block', marginRight: '10px'}}>
+                    <button onClick={() => previousPage()}
+                            className={`btn btn-primary ${currentPage <= 1 ? "disabled" : ""}`}>
+                        Trước
+                    </button>
+                </div>
+
+                <span style={{margin: "1%", fontWeight: "bold", fontSize: "20px"}}>{currentPage}/{totalPage}</span>
+
+                <div style={{display: 'inline-block'}}>
+                    <button onClick={() => nextPage()}
+                            className={`btn btn-primary ${currentPage >= totalPage ? "disabled" : ""}`}>
+                        Sau
+                    </button>
+                </div>
             </div>
+            {/*modal xóa*/}
+            <Modal show={showModal} onHide={handleCloseModal}>
+                <MyModal action={handleCloseModal} element={selectedCustomer} onDelete={deleteCustomer}/>
+            </Modal>
+
             <Footer/>
         </>
-
     )
+    console.log(6)
 }
 
-function MyModal(props) {
-    const {action, customer, onDelete} = props;
-    const handleDelete = () => {
-        onDelete();
-    };
-
-    return (
-        <>
-            <Modal.Header closeButton>
-                <Modal.Title>Xóa {customer?.name}</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-                Bạn có muốn xóa khách hàng {customer?.name} không? Lưu ý hoạt động này không thể hoàn tác!
-            </Modal.Body>
-            <Modal.Footer>
-                <Button variant="btn btn-outline-secondary" onClick={action}>
-                    Close
-                </Button>
-                <Button variant="btn btn-outline-danger" onClick={handleDelete}>
-                    Delete
-                </Button>
-            </Modal.Footer>
-        </>
-    );
-}

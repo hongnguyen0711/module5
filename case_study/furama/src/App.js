@@ -12,6 +12,7 @@ import Contracts from "./components/contract/Contract";
 import {CustomerCreate} from "./components/customer/CustomerCreate";
 import {ContractCreate} from "./components/contract/ContractCreate";
 import {CustomerEdit} from "./components/customer/CustomerEdit";
+import {ContractEdit} from "./components/contract/ContractEdit";
 
 
 function App() {
@@ -24,6 +25,7 @@ function App() {
                 <Route path="/editCustomer/:id" element={<CustomerEdit/>}/>
                 <Route path="/customer" element={<CustomerList/>}/>
                 <Route path="/contract" element={<Contracts/>}/>
+                <Route path="/editContract/:id" element={<ContractEdit/>}/>
                 <Route path="/createContract" element={<ContractCreate/>}/>
             </Routes>
             <ToastContainer/>

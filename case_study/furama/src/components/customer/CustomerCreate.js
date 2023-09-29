@@ -3,13 +3,19 @@ import * as customerService from "../../services/CustomerService";
 import {useNavigate} from "react-router";
 import {toast} from "react-toastify";
 import {ErrorMessage, Field, Form, Formik} from "formik";
-import React from "react";
+import React, {useEffect, useState} from "react";
 import * as Yup from "yup";
 
 export function CustomerCreate() {
     const navigate = useNavigate();
+    const [customerTypes, setCustomerTypes] = useState([]);
+
     const createCustomer = async (data) => {
-        const res = await customerService.create(data);
+        let newCustomer = {
+            ...data,
+            type: JSON.parse(data.type)
+        }
+        const res = await customerService.create(newCustomer);
         if (res.status === 201) {
             navigate("/customer");
             toast("Thêm mới thành công!");
@@ -17,6 +23,29 @@ export function CustomerCreate() {
             toast.error("Thất bại!");
         }
     }
+    const getCustomerType = async () => {
+        setCustomerTypes(await customerService.getCustomerType());
+    }
+    useEffect(() => {
+        getCustomerType();
+
+    }, []);
+
+    const validate = Yup.object({
+        name: Yup.string()
+            .required("Không được để trống!")
+            .matches(/^(?:[A-Z][a-z]*\s){1,2}[A-Z][a-zA-Z]*$/, "Tên phải viết hoa chữ cái đầu, không có số!"),
+        phone: Yup.string()
+            .required("Không được để trống!")
+            .matches(/^0[9]0\d{7}$|^0[9]1\d{7}$/, "Số điện thoại phải bắt đầu 090... hoặc 091.. và đủ 10 số!"),
+        card: Yup.string()
+            .required("Không được để trống!")
+            .matches(/^\d{9}$|^\d{12}$/, "Số CCCD phải đủ 9 hoặc 12 số!"),
+        email: Yup.string()
+            .required("Không được để trống!")
+            .matches(/^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/, "Email không đúng định dạng!")
+    });
+
     return (
         <>
             <div class="back" style={{marginTop: "30px"}}>
@@ -28,25 +57,24 @@ export function CustomerCreate() {
                 initialValues={{
                     name: "",
                     date: "",
-                    gender: "Nam",
+                    gender: "",
                     card: "",
                     phone: "",
                     email: "",
-                    type: "",
+                    type: JSON.stringify({
+                        id: 5,
+                        name: "Member"
+                    }),
                     address: ""
                 }}
                 onSubmit={(value) => {
                     createCustomer(value);
                 }}
-                validationSchema={Yup.object({
-                    name: Yup.string().matches(/^[A-Z][a-zA-Z]*$/, "Tên phải viết hoa chữ cái đầu, không có số!"),
-                    phone: Yup.string().matches(/^0[9]0\d{7}$|^0[9]1\d{7}$/, "Số điện thoại phải bắt đầu 090... hoặc 091.. và đủ 10 số!"),
-                    card: Yup.string().matches(/^\d{9}$|^\d{12}$/, "Số cccd phải đủ 9 hoặc 12 số!"),
-                    email: Yup.string().matches(/^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/, "Email không đúng định dạng!")
-                })}>
+                validationSchema={validate}>
+
                 <div class="container-fluid" style={{minHeight: "500px"}} align="center">
                     <div class="bg-light p-5" style={{maxWidth: "40%"}}>
-                        <h2 class="mb-4" style={{textAlign: "center"}}>Khách hàng</h2>
+                        <h2 class="mb-4" style={{textAlign: "center"}}>Thêm mới Khách hàng</h2>
                         <Form method="post">
                             <div class="form-group">
                                 <label class="form-label" htmlFor="name">Họ tên<span
@@ -62,7 +90,7 @@ export function CustomerCreate() {
                                 <label class="form-label" htmlFor="date">Ngày sinh<span
                                     style={{color: "red"}}>*</span>:</label>
                                 <div>
-                                    <Field type="text" id="date" name="date" class="form-control"
+                                    <Field type="date" id="date" name="date" class="form-control"
                                            style={{width: "100%"}}/>
                                 </div>
                             </div>
@@ -70,8 +98,11 @@ export function CustomerCreate() {
                                 <label class="form-label" htmlFor="gender">Giới tính<span
                                     style={{color: "red"}}>*</span>:</label>
                                 <div>
-                                    <Field type="text" id="gender" name="gender" class="form-control"
-                                           style={{width: "100%"}}/>
+                                    <Field as="select" id="gender" name="gender" class="form-control" style={{width: "100%"}}>
+                                        <option value="">-- Chọn giới tính --</option>
+                                            <option value="Nam">Nam</option>
+                                            <option value="Nữ">Nữ</option>
+                                    </Field>
                                 </div>
                             </div>
                             <div class="form-group">
@@ -113,8 +144,13 @@ export function CustomerCreate() {
                                 <label class="form-label" htmlFor="type">Loại khách<span
                                     style={{color: "red"}}>*</span>:</label>
                                 <div>
-                                    <Field type="text" id="type" name="type" class="form-control"
-                                           style={{width: "100%"}}/>
+                                    <Field as="select" id="type" name="type" className="form-control" style={{ width: "100%" }}>
+                                        {customerTypes.map((type) => (
+                                            <option key={type.id} value={JSON.stringify(type)}>
+                                                {type.name}
+                                            </option>
+                                        ))}
+                                    </Field>
                                 </div>
                             </div>
                             <div style={{marginTop: "20px"}} class="form-group mb-0">

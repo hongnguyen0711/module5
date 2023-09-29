@@ -1,25 +1,35 @@
 import {Link} from "react-router-dom";
-import {useNavigate} from "react-router";
-import * as contractService from "../../services/ContractService";
-import {toast} from "react-toastify";
 import {ErrorMessage, Field, Form, Formik} from "formik";
-import React from "react";
+import React, {useEffect, useState} from "react";
 import * as Yup from "yup";
+import * as contractService from "../../services/ContractService";
+import {useNavigate, useParams} from "react-router";
+import {toast} from "react-toastify";
 
-export function ContractCreate() {
-    console.log(1);
+export function ContractEdit() {
     const navigate = useNavigate();
-    const createContract = async (contract) => {
-        console.log(2)
-        const res = await contractService.create(contract);
-        if (res.status === 201) {
+    const param = useParams();
+    const [contract, setContract] = useState(null);
+
+    useEffect(() => {
+        getContract();
+    }, []);
+
+    const getContract = async () => {
+        const result = await contractService.findById(param.id);
+        console.log(result)
+        setContract(result.data);
+    }
+    const editContract = async (value) => {
+        const result = await contractService.edit(value);
+        console.log(result.status)
+        if (result.status === 200) {
             navigate("/contract");
-            toast("Thêm mới thành công!");
+            toast("Sửa thành công!");
         } else {
-            toast.error("Thất bại!")
+            toast.error("Thất bại!");
         }
     }
-
     const validate = Yup.object({
         contractNumber: Yup.string()
             .required("Không được để trống!"),
@@ -35,8 +45,7 @@ export function ContractCreate() {
             .min(0, "Phải là số nguyên dương!")
     });
 
-    console.log(3)
-    return (
+    return contract ? (
         <>
             <div class="back" style={{marginTop: "30px"}}>
                 <Link to="/contract">
@@ -45,13 +54,9 @@ export function ContractCreate() {
             </div>
             <Formik
                 initialValues={{
-                    contractNumber: "",
-                    startDate: "",
-                    endDate: "",
-                    depositAmount: 0,
-                    totalPayment: 0
+                    ...contract
                 }}
-                onSubmit={(value) => createContract(value)}
+                onSubmit={(value) => editContract(value)}
                 validationSchema={validate}
             >
                 <div class="container-fluid" style={{minHeight: "500px"}} align="center">
@@ -92,7 +97,7 @@ export function ContractCreate() {
                                 <label class="form-label" htmlFor="cccd">SỐ tiền cọc trước<span
                                     style={{color: "red"}}>*</span>:</label>
                                 <div>
-                                    <Field type="text" id="cccd" name="depositAmount" class="form-control"
+                                    <Field type="number" id="cccd" name="depositAmount" class="form-control"
                                            style={{width: "100%"}}/>
                                     <ErrorMessage name="depositAmount" component="span" className="form-err"/>
 
@@ -102,7 +107,7 @@ export function ContractCreate() {
                                 <label className="form-label" htmlFor="phone">Tổng tiền<span
                                     style={{color: "red"}}>*</span>:</label>
                                 <div>
-                                    <Field type="text" id="phone" name="totalPayment" className="form-control"
+                                    <Field type="number" id="phone" name="totalPayment" className="form-control"
                                            style={{width: "100%"}}/>
                                     <ErrorMessage name="totalPayment" component="span" className="form-err"/>
 
@@ -116,5 +121,5 @@ export function ContractCreate() {
                 </div>
             </Formik>
         </>
-    )
+    ) : null;
 }
